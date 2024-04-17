@@ -1,8 +1,10 @@
 import sys
 import json
 from urllib.parse import urlparse
-import requests
 from collections import namedtuple
+import requests
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
 
 class Recipe:
@@ -71,6 +73,18 @@ class RecipeProcessor:
 
     def get_recipes(self):
         return self.recipes
+    
+class RecipeUi(QMainWindow):
+    def __init__(self, height, width):
+        super().__init__()
+        self.height = height
+        self.width = width
+        setup_window(self)
+
+    def setup_window(self):
+        self.setWindowTitle("Recipes")
+        self.setFixedSize(QSize(self.width, self.height))
+
 
 
 def main():
