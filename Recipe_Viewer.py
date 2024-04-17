@@ -74,16 +74,32 @@ class RecipeProcessor:
     def get_recipes(self):
         return self.recipes
     
-class RecipeUi(QMainWindow):
+class RecipeUi(QDialog):
     def __init__(self, height, width):
         super().__init__()
         self.height = height
         self.width = width
-        setup_window(self)
+        self.setup_window()
 
     def setup_window(self):
+        layout = QGridLayout()
+        recipe1 = QGroupBox()
+        recipe2 = QGroupBox()
+        recipe3 = QGroupBox()
+        recipe4 = QGroupBox()
+        layout.addWidget(recipe1(), 0,0)
+        layout.addWidget(recipe2(), 0,1)
+        layout.addWidget(recipe3(), 1,0)
+        layout.addWidget(recipe4(), 1,1)
         self.setWindowTitle("Recipes")
         self.setFixedSize(QSize(self.width, self.height))
+        self.setLayout(layout)
+        self.layout_ui()
+
+    def layout_ui(self, recipes:list):
+        count = recipes.len()
+        
+        
 
 
 
