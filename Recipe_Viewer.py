@@ -107,9 +107,14 @@ class RecipeUi(QDialog):
 
     def layout_ui(self):
 
-        #top_layout = QFormLayout()
-        #top_layout.addRow(QLabel(self.tr("&Name:")), QLineEdit)
-        #self.layout.addWidget(top_layout, 0,0)
+        search_text = QLineEdit()
+        search_button = QPushButton("Search", self)
+        reset_button = QPushButton("Reset", self)
+        top_button_box = QDialogButtonBox(Qt.Horizontal)
+        top_button_box.addButton(search_button, QDialogButtonBox.ActionRole)
+        top_button_box.addButton(reset_button, QDialogButtonBox.ActionRole)
+        self.layout.addWidget(search_text, 0, 0,  Qt.AlignTop)
+        self.layout.addWidget(top_button_box, 0, 1, Qt.AlignTop)
 
         start_index = self.page * self.per_page
         end_index = min((self.page + 1) * self.per_page, len(self.recipes))
@@ -141,51 +146,90 @@ class RecipeUi(QDialog):
             group_layout.addWidget(cook_label)
             group_layout.addWidget(prep_label)
             group_layout.addWidget(view_button)
-            self.layout.addWidget(group_box, i//2, i%2)
+            self.layout.addWidget(group_box, (i//2)+1, i%2)
 
         next_button = QPushButton("Next Page", self)
         prev_button = QPushButton("Previous Page", self)
         first_button = QPushButton("First Page", self)
         last_button = QPushButton("Last Page", self)
-        search_button = QPushButton("Search", self)
-        reset_button = QPushButton("Reset", self)
         bottom_button_box = QDialogButtonBox(Qt.Horizontal)
         bottom_button_box.addButton(prev_button, QDialogButtonBox.ActionRole)
         bottom_button_box.addButton(first_button, QDialogButtonBox.ActionRole)
         bottom_button_box.addButton(last_button, QDialogButtonBox.ActionRole)
         bottom_button_box.addButton(next_button, QDialogButtonBox.ActionRole)
         self.layout.addWidget(bottom_button_box, 3, 1, Qt.AlignRight)
-        top_button_box = QDialogButtonBox(Qt.Horizontal)
-        top_button_box.addButton(search_button, QDialogButtonBox.ActionRole)
-        top_button_box.addButton(reset_button, QDialogButtonBox.ActionRole)
-        #self.layout.addWidget(top_button_box, Qt.AlignRight)
         if end_index != len(self.recipes):
             next_button.clicked.connect(lambda: self.next())
         if self.page != 0:
             prev_button.clicked.connect(lambda: self.previous())
+        first_button.clicked.connect(lambda: self.first())
+        last_button.clicked.connect(lambda:self.last())
+        reset_button.clicked.connect(lambda: self.reset(search_text))
 
 
     ###called when the user clicks the next button. This method should get the next set of recipes in the list and update the UI with new information
     def next(self):
         self.page += 1
+        to_remove_1 = self.layout.itemAtPosition(1,0)
+        to_remove_2 = self.layout.itemAtPosition(1, 1)
+        to_remove_3 = self.layout.itemAtPosition(2, 0)
+        to_remove_4 = self.layout.itemAtPosition(2, 1)
+        self.layout.removeWidget(to_remove_1.widget())
+        self.layout.removeWidget(to_remove_2.widget())
+        self.layout.removeWidget(to_remove_3.widget())
+        self.layout.removeWidget(to_remove_4.widget())
         self.layout_ui()
 
     def previous(self):
         self.page -= 1
+        to_remove_1 = self.layout.itemAtPosition(1,0)
+        to_remove_2 = self.layout.itemAtPosition(1, 1)
+        to_remove_3 = self.layout.itemAtPosition(2, 0)
+        to_remove_4 = self.layout.itemAtPosition(2, 1)
+        self.layout.removeWidget(to_remove_1.widget())
+        self.layout.removeWidget(to_remove_2.widget())
+        self.layout.removeWidget(to_remove_3.widget())
+        self.layout.removeWidget(to_remove_4.widget())
         self.layout_ui()
         ###called when the user clicks the previous button. This method should get the previous set of recipes in the list and update the UI with new information
     def first(self):
         ### jumps to the beginning of the list of recipes and shows the first set in the UI based on the selected number per page value
         self.page = 0
+        to_remove_1 = self.layout.itemAtPosition(1,0)
+        to_remove_2 = self.layout.itemAtPosition(1, 1)
+        to_remove_3 = self.layout.itemAtPosition(2, 0)
+        to_remove_4 = self.layout.itemAtPosition(2, 1)
+        self.layout.removeWidget(to_remove_1.widget())
+        self.layout.removeWidget(to_remove_2.widget())
+        self.layout.removeWidget(to_remove_3.widget())
+        self.layout.removeWidget(to_remove_4.widget())
         self.layout_ui()
-    def last():
-         ###jumps to the end of the list of recipes and shows the last set in the UI based on the selected number per page value
-        ()
+    def last(self):
+        ###jumps to the end of the list of recipes and shows the last set in the UI based on the selected number per page value
+        self.page = len(self.recipes)//4
+        to_remove_1 = self.layout.itemAtPosition(1, 0)
+        to_remove_2 = self.layout.itemAtPosition(1, 1)
+        to_remove_3 = self.layout.itemAtPosition(2, 0)
+        to_remove_4 = self.layout.itemAtPosition(2, 1)
+        self.layout.removeWidget(to_remove_1.widget())
+        self.layout.removeWidget(to_remove_2.widget())
+        self.layout.removeWidget(to_remove_3.widget())
+        self.layout.removeWidget(to_remove_4.widget())
+        self.layout_ui()
     def search(recipe_keywords):
         ###searches the recipe list for recipes whose name, ingredients, or description contains the user-supplied string. The next, previous, first, and last buttons should also be used to navigate the search results when the user submits a search query.
         ()
-    def reset(self):
+    def reset(self, search_text):
+        search_text.clear()
         self.page = 0
+        to_remove_1 = self.layout.itemAtPosition(1,0)
+        to_remove_2 = self.layout.itemAtPosition(1, 1)
+        to_remove_3 = self.layout.itemAtPosition(2, 0)
+        to_remove_4 = self.layout.itemAtPosition(2, 1)
+        self.layout.removeWidget(to_remove_1.widget())
+        self.layout.removeWidget(to_remove_2.widget())
+        self.layout.removeWidget(to_remove_3.widget())
+        self.layout.removeWidget(to_remove_4.widget())
         self.layout_ui()
         ###clears the search results and returns to normal pagination of the list of recipes
     
