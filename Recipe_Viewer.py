@@ -29,6 +29,7 @@ class Recipe:
         self.ingredients = ingredients
         self.description = description
         self.image_file = image
+        self.image_url = image
 
     # Get name of recipe
     def get_name(self):
@@ -49,14 +50,14 @@ class Recipe:
     # Download image from web and display in the UI. An ACII-based progress bar must be displayed in the command line
     # as images are downloaded. This should include the index of the image downloaded (Ex: Downloading image 10 of xxx)
     def set_image(self, url):
-        #try:
+        try:
             response = requests.get(url)
             if response.status_code == 200:
                 self.image_file = urlparse(url).path.split('/')[-1]
                 with open(self.image_file, 'wb') as f:
                     f.write(response.content)
-        #except Exception as e:
-            #print("Error while downloading image", e)
+        except Exception as e:
+            print("Error while downloading image", e)
         
 
     # Returns name of an image file for saving or displaying (saved images must have same name as url)
@@ -105,6 +106,11 @@ class RecipeUi(QDialog):
         self.layout_ui()
 
     def layout_ui(self):
+
+        #top_layout = QFormLayout()
+        #top_layout.addRow(QLabel(self.tr("&Name:")), QLineEdit)
+        #self.layout.addWidget(top_layout, 0,0)
+
         start_index = self.page * self.per_page
         end_index = min((self.page + 1) * self.per_page, len(self.recipes))
 
@@ -122,7 +128,7 @@ class RecipeUi(QDialog):
             #view_button.clicked.connect() #show the recipe
 
             #donwload images
-            recipe.set_image(recipe.get_image())
+            recipe.set_image(recipe.image_url)
 
             image_label = QLabel()
             pixmap = QPixmap(recipe.get_image())
@@ -161,8 +167,8 @@ class RecipeUi(QDialog):
 
     ###called when the user clicks the next button. This method should get the next set of recipes in the list and update the UI with new information
     def next(self):
-                self.page += 1
-                self.layout_ui()
+        self.page += 1
+        self.layout_ui()
 
     def previous(self):
         self.page -= 1
@@ -180,6 +186,7 @@ class RecipeUi(QDialog):
         ()
     def reset(self):
         self.page = 0
+        self.layout_ui()
         ###clears the search results and returns to normal pagination of the list of recipes
     
 
