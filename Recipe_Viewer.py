@@ -10,22 +10,22 @@ from PyQt5.QtGui import QPixmap
 
 
 class Recipe:
-    def __init__(self, name, description, image, recipeYield, cookTime, prepTime, ingredients):
+    def __init__(self, name, description, image, recipe_yield, cook_time, prep_time, ingredients):
         self.name = name
 
-        cook_match = re.match(r'PT(\d+)M', cookTime)
+        cook_match = re.match(r'PT(\d+)M', cook_time)
         if cook_match:
-            self.cookTime = int(cook_match.group(1))
+            self.cook_time = int(cook_match.group(1))
         else:
-            self.cookTime = 0
+            self.cook_time = 0
 
-        prep_match = re.match(r'PT(\d+)M', prepTime)
+        prep_match = re.match(r'PT(\d+)M', prep_time)
         if prep_match:
-            self.prepTime = int(prep_match.group(1))
+            self.prep_time = int(prep_match.group(1))
         else:
-            self.prepTime = 0
+            self.prep_time = 0
 
-        self.recipeYield = recipeYield
+        self.recipe_yield = recipe_yield
         self.ingredients = ingredients
         self.description = description
         self.image_file = image
@@ -36,27 +36,27 @@ class Recipe:
 
     # Get and return cookTime for recipe in HH:MM format with leading zeros
     def get_cook_time(self):
-        return self.format_time(self.cookTime)
+        return self.format_time(self.cook_time)
 
     # Get and return prepTime for recipe in HH:MM format with leading zeros
     def get_prep_time(self):
-        return self.format_time(self.prepTime)
+        return self.format_time(self.prep_time)
 
     # Get and return recipeYield for a given recipe
     def get_recipe_yield(self):
-        return self.recipeYield
+        return self.recipe_yield
 
     # Download image from web and display in the UI. An ACII-based progress bar must be displayed in the command line
     # as images are downloaded. This should include the index of the image downloaded (Ex: Downloading image 10 of xxx)
     def set_image(self, url):
-        try:
+        #try:
             response = requests.get(url)
             if response.status_code == 200:
                 self.image_file = urlparse(url).path.split('/')[-1]
                 with open(self.image_file, 'wb') as f:
                     f.write(response.content)
-        except Exception as e:
-            print("Error while downloading image", e)
+        #except Exception as e:
+            #print("Error while downloading image", e)
         
 
     # Returns name of an image file for saving or displaying (saved images must have same name as url)
@@ -111,9 +111,9 @@ class RecipeUi(QDialog):
         for i, recipe_index in enumerate(range(start_index, end_index)):
             recipe = self.recipes[recipe_index]
             group_box = QGroupBox()
-            group_box.setFixedSize(QSize(int(self.width/2), int(self.height/2)))
+            group_box.setFixedSize(QSize(int((self.width-50)/2), int((self.height-100)/2)))
             group_layout = QVBoxLayout(group_box)
-            number_label = QLabel(f"Recipe #: {recipe_index}")
+            number_label = QLabel(f"Recipe #: {recipe_index+1}")
             name_label = QLabel(f"Name: {recipe.get_name()}")
             cook_label = QLabel(f"Cook Time: {recipe.get_cook_time()}")
             prep_label = QLabel(f"Prep Time: {recipe.get_prep_time()}")
@@ -137,24 +137,50 @@ class RecipeUi(QDialog):
             group_layout.addWidget(view_button)
             self.layout.addWidget(group_box, i//2, i%2)
 
-    def next():
-        ###called when the user clicks the next button. This method should get the next set of recipes in the list and update the UI with new information
-        ()
-    def previous():
+        next_button = QPushButton("Next Page", self)
+        prev_button = QPushButton("Previous Page", self)
+        first_button = QPushButton("First Page", self)
+        last_button = QPushButton("Last Page", self)
+        search_button = QPushButton("Search", self)
+        reset_button = QPushButton("Reset", self)
+        bottom_button_box = QDialogButtonBox(Qt.Horizontal)
+        bottom_button_box.addButton(prev_button, QDialogButtonBox.ActionRole)
+        bottom_button_box.addButton(first_button, QDialogButtonBox.ActionRole)
+        bottom_button_box.addButton(last_button, QDialogButtonBox.ActionRole)
+        bottom_button_box.addButton(next_button, QDialogButtonBox.ActionRole)
+        self.layout.addWidget(bottom_button_box, 3, 1, Qt.AlignRight)
+        top_button_box = QDialogButtonBox(Qt.Horizontal)
+        top_button_box.addButton(search_button, QDialogButtonBox.ActionRole)
+        top_button_box.addButton(reset_button, QDialogButtonBox.ActionRole)
+        #self.layout.addWidget(top_button_box, Qt.AlignRight)
+        if end_index != len(self.recipes):
+            next_button.clicked.connect(lambda: self.next())
+        if self.page != 0:
+            prev_button.clicked.connect(lambda: self.previous())
+
+
+    ###called when the user clicks the next button. This method should get the next set of recipes in the list and update the UI with new information
+    def next(self):
+                self.page += 1
+                self.layout_ui()
+
+    def previous(self):
+        self.page -= 1
+        self.layout_ui()
         ###called when the user clicks the previous button. This method should get the previous set of recipes in the list and update the UI with new information
-        ()
-    def first():
-        ### jumps to the beginning of the list of recipes and shows the first set in the UI based on the selected numberper page value
-        ()
+    def first(self):
+        ### jumps to the beginning of the list of recipes and shows the first set in the UI based on the selected number per page value
+        self.page = 0
+        self.layout_ui()
     def last():
          ###jumps to the end of the list of recipes and shows the last set in the UI based on the selected number per page value
         ()
     def search(recipe_keywords):
         ###searches the recipe list for recipes whose name, ingredients, or description contains the user-supplied string. The next, previous, first, and last buttons should also be used to navigate the search results when the user submits a search query.
         ()
-    def reset():
+    def reset(self):
+        self.page = 0
         ###clears the search results and returns to normal pagination of the list of recipes
-        ()
     
 
 
@@ -165,7 +191,7 @@ def main():
 
     app = QApplication(sys.argv)
     recipes = processor.get_recipes()
-    window = RecipeUi(400, 600, recipes)
+    window = RecipeUi(700, 900, recipes)
     window.show()
     sys.exit(app.exec_())
 
